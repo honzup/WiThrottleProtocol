@@ -202,6 +202,7 @@ void WiThrottleProtocol::sendCommand(String cmd) {
         if (server) {
             stream->println("");
         }
+        stream->flush();
         console->print("WiT:: ==> "); console->println(cmd);
     }
 }
@@ -249,6 +250,7 @@ void WiThrottleProtocol::sendDelayedCommand(String cmd) {
                 if (server) {
                     stream->println("");
                 }
+                stream->flush();
                 if (logLevel>0) {
                     console->print("WiT:: ==> "); console->print(thisCmd);
                     console->print(" ("); console->print(millis()); console->println(")");
@@ -865,15 +867,13 @@ void WiThrottleProtocol::processRosterFunctionListEntries(char multiThrottle, co
 	int entryStartPosition = 3; //ignore the first entry separator
     if (s.length() <= 3) entryFound =false;
 
-    while ((entryFound) && (entries < MAX_FUNCTIONS)) {
+    while ((entryFound) && (entries < (MAX_FUNCTIONS - 1))) {
 	    entries++;
 
 		// get element
 		int entrySeparatorPosition = s.indexOf(ENTRY_SEPARATOR, entryStartPosition);
         if (entrySeparatorPosition == -1) entrySeparatorPosition = s.length();
-		String entry = s.substring(entryStartPosition, entrySeparatorPosition);
-        functions[entries] = entry;
-		if (logLevel>1) { console->print("WiT:: Function Entry: "); console->print(entries); console->print(" - "); console->println(entry); }
+		functions[entries] = s.substring(entryStartPosition, entrySeparatorPosition);
         
         entryStartPosition = entrySeparatorPosition + 3;
     }
@@ -1599,7 +1599,7 @@ void WiThrottleProtocol::setFunction(char multiThrottle, String address, int fun
     else {
         cmd += "0";
     }
-    cmd += funcNum;
+    cmd += std::to_string(funcNum);
     sendDelayedCommand(cmd);
 
     if (logLevel>1) console->println("WiT:: setFunction(): end"); 
