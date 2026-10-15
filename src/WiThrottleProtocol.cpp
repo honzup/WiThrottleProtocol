@@ -662,7 +662,7 @@ void WiThrottleProtocol::processRosterList(char *c, int len) {
 	if (delegate) delegate->receivedRosterEntries(entries);	
 	
 	// loop
-	int entryStartPosition = 4; //ignore the first entry separator
+	int entryStartPosition = indexSeperatorPosition + 3; // skip "<count>]\[" - the count can be several digits
 	for(int i = 0; i < entries; i++) {
 	
 		// get element
